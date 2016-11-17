@@ -1,0 +1,63 @@
+# Function Declaration 
+countAlgo(){
+	local val=`ls | grep -c "algo-"`
+	echo $val
+}
+createSub(){
+		path=$1
+		mkdir "$path"	
+		touch "$path/1.sh"
+		touch "$path/algo.txt"
+		touch "$path/readme.txt"	
+		
+		echo "step-1 : START" >> "$path/algo.txt"
+		echo "[Algo_Used]" >> "$path/readme.txt"
+		echo "[Shell_Commands_Used]" >> "$path/readme.txt"
+		echo "[Shell_Script_Syntax]" >> "$path/readme.txt"
+		echo "[Tags]" >> "$path/readme.txt"
+		echo "[Other]" >> "$path/readme.txt"
+}
+createFol(){
+		path=`pwd`
+		mkdir $1
+		touch "$1/readme.txt"
+		count=$(countAlgo)
+		createSub $1/"algo-"`expr $count + 1`
+
+		echo "[Question]" >> "$1/readme.txt"
+		echo "[Algorithms]" >> "$1/readme.txt"
+		echo "[Tags]" >> "$1/readme.txt"
+
+}
+#main program
+if [ $# -gt 0 ]
+then
+	while [ "$1" != "" -a  "$1" != " " ]
+	do
+		case $1 in
+		"-m")
+			createFol $2
+			shift 2
+		;;
+		"-s")
+			if [ "$2" != "" ]
+			then
+				createSub $2
+				shift 1
+			else
+				count=$(countAlgo)
+				createSub "algo-"`expr $count + 1`
+			fi
+			shift 1	
+		;;
+		*)
+			echo "`basename ${0}`:usage: "
+			echo "[-m folder_name]"
+			echo "[-s (folder_name)]"
+			exit 1	#command to come out of the program with status 1
+		;;
+		esac
+	done
+else
+	echo "No Argument Passed"
+fi
