@@ -1,0 +1,15 @@
+#! /bin/bash
+	
+for i; do true; done
+file=$i
+count=1
+date=`date`
+for i in "$@"
+do
+	if [ $count -lt $# ]
+	then	
+		echo "$date > $i" >> $file
+	fi
+	count=$((count + 1))
+done
+
