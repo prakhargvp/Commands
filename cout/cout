@@ -1,0 +1,90 @@
+# Functions
+	usage() {
+		echo "Usage: $0 [OPTIONS] FILE"
+		exit 1
+	}
+# Predefined Variable
+itype=""
+otype=""
+ofile="output.txt"
+# Get Options
+while getopts ":i:o:t:" opt; do
+ case "${opt}" in
+  i)
+	i=${OPTARG}
+	if [ -f "$i" ]; then
+		itype="f"
+	elif [ -d "$i" ]; then
+		itype="d"
+	else
+		echo "$i : File/Folder Not Found"
+		usage
+	fi
+  ;;
+  o)
+	o=${OPTARG}
+	if [ -d "$o" ]; then
+		otype="d"
+		o="${o}/"
+	elif [ -f "$o" ]; then
+		otype="f"
+		temp="n"
+		while [	-f "$o" ] && [ "$temp" != "y" -o $temp != "Y" ]; do
+			echo -n "Overwrite File (y/n) : "
+			read temp
+		done
+	fi
+  ;;
+  t)
+	t=${OPTARG}
+  ;;
+  *)
+	usage
+  ;;
+ esac
+done
+
+shift $((OPTIND-1))
+
+file=$1
+if [ ! -f "$file" ]; then
+	usage
+fi
+
+exefile=$file
+if [ "$t" = "c" ] || [ "$t" = "C" ] 
+then
+	exefile="${file}_temp"
+	gcc $file -o $exefile
+fi
+
+if [ "$otype" = "d" ]; then
+	o="${o}${ofile}"
+elif [ "$otype" = "f" ]; then
+	o="$o"
+else
+	o="${ofile}"
+fi
+
+if [ -z "$i" ]; then
+	script -qc "./${exefile}" ${o} ; sed -n '2,$p' "${o}" > "${o}_temp" 
+	mv "${o}_temp" "${o}";
+elif [ "${itype}" = "f" ]; then
+	script -qc "./${exefile} < ${i}" > ${o} ; sed -n '2,$p' "${o}" > "${o}_temp" 
+	mv "${o}_temp" "${o}";
+else
+	for fname in $(ls -1 "$i");do
+		if [ -z "$otype" ]; then
+			if [ ! -d "output" ];then
+				mkdir "output"				
+			fi
+			o="output/${fname}"
+		fi
+		f="${i}/${fname}";
+		script -qc "./${exefile} < ${f}" ${o} ; sed -n '2,$p' "${o}" > "${o}_temp" 
+		mv "${o}_temp" "${o}";
+	done
+fi
+# Remove Temporary File and Rename
+rm "${exefile}"
+

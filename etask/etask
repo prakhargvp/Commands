@@ -7,15 +7,17 @@ createSub(){
 		path=$1
 		mkdir "$path"	
 		touch "$path/1.sh"
+		touch "$path/1.c"
 		touch "$path/algo.txt"
 		touch "$path/readme.txt"	
 		
 		echo "step-1 : START" >> "$path/algo.txt"
 		echo "[Algo_Used]" >> "$path/readme.txt"
-		echo "[Shell_Commands_Used]" >> "$path/readme.txt"
-		echo "[Shell_Script_Syntax]" >> "$path/readme.txt"
+		echo "[Functions]" >> "$path/readme.txt"
+		echo "[Syntax]" >> "$path/readme.txt"
 		echo "[Tags]" >> "$path/readme.txt"
 		echo "[Other]" >> "$path/readme.txt"
+		echo "[Commnads]" >> "$path/readme.txt"
 }
 createFol(){
 		path=`pwd`
@@ -27,7 +29,7 @@ createFol(){
 		echo "[Question]" >> "$1/readme.txt"
 		echo "[Algorithms]" >> "$1/readme.txt"
 		echo "[Tags]" >> "$1/readme.txt"
-
+		echo "[Ques-url]" >> "$1/readme.txt"
 }
 #main program
 if [ $# -gt 0 ]
