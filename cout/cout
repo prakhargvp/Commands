@@ -52,10 +52,14 @@ if [ ! -f "$file" ]; then
 fi
 
 exefile=$file
-if [ "$t" = "c" ] || [ "$t" = "C" ] 
+if [ "$t" = "c" ]
 then
 	exefile="${file}_temp"
 	gcc $file -o $exefile
+elif [ "$t" = "C" ]
+then
+	exefile="${file}_temp"
+	gcc $file -o $exefile -lstdc++
 fi
 
 if [ "$otype" = "d" ]; then
