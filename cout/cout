@@ -1,3 +1,4 @@
+# #!/bin/bash
 # Functions
 	usage() {
 		echo "Usage: $0 [OPTIONS] FILE"
@@ -23,13 +24,14 @@ while getopts ":i:o:t:" opt; do
   ;;
   o)
 	o=${OPTARG}
+	ofile="$o"
 	if [ -d "$o" ]; then
 		otype="d"
 		o="${o}/"
 	elif [ -f "$o" ]; then
 		otype="f"
 		temp="n"
-		while [	-f "$o" ] && [ "$temp" != "y" -o $temp != "Y" ]; do
+		while [	-f "$o" ] && [[ ! $temp =~ [yY] ]]; do
 			echo -n "Overwrite File (y/n) : "
 			read temp
 		done
@@ -71,10 +73,10 @@ else
 fi
 
 if [ -z "$i" ]; then
-	script -qc "./${exefile}" ${o} ; sed -n '2,$p' "${o}" > "${o}_temp" 
+	script -qc "./${exefile}" ${o} ; sed -n '1,$p' "${o}" > "${o}_temp" 
 	mv "${o}_temp" "${o}";
 elif [ "${itype}" = "f" ]; then
-	script -qc "./${exefile} < ${i}" > ${o} ; sed -n '2,$p' "${o}" > "${o}_temp" 
+	script -qc "./${exefile} < ${i}" > ${o} ; sed -n '1,$p' "${o}" > "${o}_temp" 
 	mv "${o}_temp" "${o}";
 else
 	for fname in $(ls -1 "$i");do
@@ -85,7 +87,7 @@ else
 			o="output/${fname}"
 		fi
 		f="${i}/${fname}";
-		script -qc "./${exefile} < ${f}" ${o} ; sed -n '2,$p' "${o}" > "${o}_temp" 
+		script -qc "./${exefile} < ${f}" ${o} ; sed -n '1,$p' "${o}" > "${o}_temp" 
 		mv "${o}_temp" "${o}";
 	done
 fi
