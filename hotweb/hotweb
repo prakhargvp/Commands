@@ -1,0 +1,120 @@
+#!/bin/bash
+
+# Functions
+usage(){
+	echo "Not Sufficient or Proper Arguments."
+	echo "$0 webSiteName [webSitePath]"
+	exit 1
+}
+error(){
+	echo $1
+}
+process(){
+	echo $1
+}
+errorExit(){
+	echo $1
+	echo "bye..."
+	exit	
+}
+isProceed(){
+	echo -n "Continue(y/n): "
+	read isP
+	if [[ "$isP" != 'y' ]];then
+		errorExit ""
+	fi
+
+}
+# Predefined Varaibles
+hostFile="/etc/hosts"
+apachePath="/etc/apache2/"
+# Main Program
+if [ $# -lt 1 ]; then
+	usage
+fi
+webName=$1
+# If 2nd Parameter is not passed Then,
+if [ -z "$2" -o "$2" == " " ]; then
+
+	file="/var/www/sites/$1/public_html"
+else
+	file=$2
+fi
+# Firstly create a provided domain host file
+# 1. To validate the given url
+# 2. Create .conf file in sites/availabel
+# Check if direcotry exist or not
+if [ ! -d "$file" ];then
+	echo "Direcotry Structure Not exist: $file"
+	echo -n "Create(y/n): "
+	read isCreate
+	if [[ $isCreate = 'y' ]];then
+		# process is used to notify user about any changes in file system
+		process "Directory Structure Created: $file"
+		mkdir -p "$file"
+		# Check is index file exist or not
+		if [[ ! -f "$file/index.html" || ! -f "$file/index.php" ]];then
+			echo "Welcome in $webName."  | tee "$file/index.html" > /dev/null
+		fi
+	else
+		errorExit "So Create the file Strucutre Manually."
+	fi
+else
+	echo "File Structure Already Exist: $file"
+	isProceed
+fi
+
+# To check virtual host file .conf is already exist or not
+vfile="$1.conf"
+vfilePath="${apachePath}sites-available/$vfile"
+if [ -f $vfile ];then
+	error "Virtual File already Exist: $vfilePath"
+	isProceed
+	process "Virtual File Overwrite: $vfilePath"
+else
+	process "Virtual File Created: $vfilePath"
+fi
+echo "
+<VirtualHost *:80>
+
+	ServerName $1 
+	ServerAlias www.$1
+	ServerAdmin webmaster@localhost
+
+	DirectoryIndex index.php
+	DirectoryIndex index.html
+	DocumentRoot $file 
+
+        <Directory \"$file/\">
+                        Options Indexes FollowSymLinks MultiViews
+                        AllowOverride All
+                        Order allow,deny
+                        allow from all
+        </Directory>
+	
+	#Custom log file locations
+	LogLevel warn
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+	# For most configuration files from conf-available/, which are
+	# enabled or disabled at a global level, it is possible to
+	# include a line for only one particular virtual host. For example the
+	# following line enables the CGI configuration for this host only
+	# after it has been globally disabled with "a2disconf".
+	#Include conf-available/serve-cgi-bin.conf
+
+</VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+"  | sudo tee "$vfilePath" > /dev/null
+
+# Now enable the site
+# a2ensite wants only filename not its path
+sudo a2ensite "$vfile"
+
+# Reload the web sever
+sudo service apache2 reload
+
+# add website name to host file
+echo "127.0.0.1 $webName" | sudo tee -a "$hostFile" > /dev/null
