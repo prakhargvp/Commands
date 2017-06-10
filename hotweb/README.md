@@ -16,8 +16,9 @@ Virtual File Created: /etc/apache2/sites-available/devl.local.conf
 Enabling site devl.local.
 To activate the new configuration, you need to run:
   service apache2 reload
- * Reloading web server apache2    
-user@system:~$
+Site devl.local already enabled
+ * Reloading web server apache2
+user@system:~$   
 ```
 
 <b>Examples 2:</b> To create a localhost website with 2 argument 
@@ -32,6 +33,7 @@ Create(y/n): y
 Directory Structure Created: /var/www/sites/devl.local/public_html
 Virtual File Created: /etc/apache2/sites-available/devl.local.conf
 Site devl.local already enabled
- * Reloading web server apache2                                                                                                 user@system:~$                * 
+ * Reloading web server apache2
+user@system:~$
 ```
 
