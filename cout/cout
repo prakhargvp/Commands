@@ -1,4 +1,4 @@
-# #!/bin/bash
+#!/bin/bash
 # Functions
 	usage() {
 		echo "Usage: $0 [OPTIONS] FILE"
@@ -62,6 +62,11 @@ elif [ "$t" = "C" ]
 then
 	exefile="${file}_temp"
 	gcc $file -o $exefile -lstdc++
+elif [ "$t" = "py" -o "$t" = "PY" ]
+then
+	exefile="${file}_temp"
+	cp $file $exefile	
+	chmod +x $exefile
 fi
 
 if [ "$otype" = "d" ]; then
